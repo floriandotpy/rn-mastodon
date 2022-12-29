@@ -10,6 +10,7 @@
 
 import React, {type PropsWithChildren} from 'react';
 import {
+  FlatList,
   SafeAreaView,
   ScrollView,
   StatusBar,
@@ -57,6 +58,58 @@ const Section: React.FC<
   );
 };
 
+const listStyles = StyleSheet.create({
+  container: {
+   flex: 1,
+   paddingTop: 22
+  },
+  item: {
+    padding: 10,
+    fontSize: 18,
+    height: 44,
+  },
+});
+
+
+type TootType = {
+  key: string,
+  author: string,
+  content: string
+}
+const Timeline = () => {
+  const img = {
+    uri: 'https://reactnative.dev/img/tiny_logo.png',
+    width: 64,
+    height: 64
+  };
+  const toots: Array<TootType> = [
+    {
+      "key": "1",
+      "author": "Peter",
+      "content": "Hello this is Peter's toot"
+    },
+    {
+      "key": "2",
+      "author": "Uma T",
+      "content": "Hello Mastodon, let's build a small mobile app"
+    }
+  ];
+  const renderItem = ({item}) => {
+      return (
+        <Text style={listStyles.item}>
+          {item.author} wrote: {item.content}
+        </Text>
+      );
+      
+  } 
+  return (
+    <View>
+      <FlatList style={listStyles.container} data={toots} renderItem={renderItem}></FlatList>
+      
+    </View>
+  );
+}
+
 const App = () => {
   const isDarkMode = useColorScheme() === 'dark';
 
@@ -73,25 +126,14 @@ const App = () => {
       <ScrollView
         contentInsetAdjustmentBehavior="automatic"
         style={backgroundStyle}>
-        <Header />
+        
         <View
           style={{
             backgroundColor: isDarkMode ? Colors.black : Colors.white,
           }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
+          
+          <Timeline />
+          
         </View>
       </ScrollView>
     </SafeAreaView>
