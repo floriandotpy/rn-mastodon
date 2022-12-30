@@ -8,7 +8,7 @@
  * @format
  */
 import { getUserTimeline } from "./src/service/mastodonService"
-import React, {type PropsWithChildren} from 'react';
+import React, {useEffect, useState, type PropsWithChildren} from 'react';
 import {
   FlatList,
   SafeAreaView,
@@ -27,6 +27,7 @@ import {
   LearnMoreLinks,
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
+import { Status } from "./src/@types/mastodon";
 
 const Section: React.FC<
   PropsWithChildren<{
@@ -73,7 +74,15 @@ const listStyles = StyleSheet.create({
 
 const Timeline = () => {
 
-  const timeline = getUserTimeline();
+  const [timeline, setTimeline] = useState<Array<Status>>([]);
+
+  // const timeline = getUserTimeline();
+  useEffect(() => {
+    const fetchData = async () => {
+      setTimeline(await getUserTimeline())
+    }
+    fetchData()
+  }, [])
 
   return (
     <View>
