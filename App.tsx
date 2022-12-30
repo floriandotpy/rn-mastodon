@@ -20,7 +20,9 @@ import {
   Text,
   useColorScheme,
   View,
+  useWindowDimensions
 } from 'react-native';
+
 
 import {
   Colors,
@@ -29,6 +31,7 @@ import {
   LearnMoreLinks,
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
+import RenderHtml from 'react-native-render-html';
 import { Status } from "./src/@types/mastodon";
 
 const Section: React.FC<
@@ -66,7 +69,8 @@ const listStyles = StyleSheet.create({
    paddingTop: 22
   },
   item: {
-    padding: 8,
+    paddingHorizontal: 8,
+    paddingVertical: 24,
     borderBottomColor: "#A6A6AA",
     borderBottomWidth: 1
   },
@@ -77,7 +81,7 @@ const listStyles = StyleSheet.create({
   item_meta: {
     fontSize: 14,
     color: "#666666",
-    marginBottom: 4
+    marginBottom: 8
   },
   item_content: {
     fontSize: 16,
@@ -91,6 +95,7 @@ const wait = (timeout: number) => {
 
 const Timeline = () => {
 
+  const { width } = useWindowDimensions();
   const [timeline, setTimeline] = useState<Array<Status>>([]);
   const [shouldRefresh, setShouldRefresh] = useState<boolean>(true);
 
@@ -129,12 +134,23 @@ const Timeline = () => {
   }, [timeline]);
 
   const renderItem = ({item}) => {
+    const source = {
+      html: item.content
+    }
     return (
       <View style={listStyles.item}>
         <Text style={listStyles.item_title}>{item.account.display_name}</Text>
         <Text style={listStyles.item_meta}>@{item.account.acct} · {item.created_at}</Text>
-        <Text>{item.reblog ? "This is a reblog" : ""}</Text>
-        <Text style={listStyles.item_content}>{item.content}</Text>
+        {item.reblog ? <Text>This is a reblog</Text> : 
+          <RenderHtml
+            baseStyle={listStyles.item_content}
+            contentWidth={width}
+            source={source}
+          />
+        }
+        {/* <Text style={listStyles.item_content}>{item.content}</Text> */}
+        {/* <Text>Width: {width}</Text> */}
+        
       </View>
     ) 
   }
