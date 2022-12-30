@@ -93,13 +93,12 @@ const Timeline = () => {
 
   const [timeline, setTimeline] = useState<Array<Status>>([]);
   const [shouldRefresh, setShouldRefresh] = useState<boolean>(true);
-  const [page, setPage] = useState<number>(0);
 
   useEffect(() => {
     if (shouldRefresh) {
       console.log("Refreshing from API")
       const fetchData = async () => {
-        setTimeline(await getUserTimeline())
+        setTimeline(await getUserTimeline(null))
       }
       fetchData()
     }
@@ -110,14 +109,24 @@ const Timeline = () => {
   }, [shouldRefresh])
 
   const onRefresh = useCallback(() => {
-    console.log("onRefresh")
+    console.log("pulled: refresh")
     setShouldRefresh(true);
-    console.log(shouldRefresh)
   }, []);
 
-  const loadMore = () => {
-    console.log("Should load more from API")
-  }
+  const loadMore = useCallback(() => {
+    console.log("Loading more from API")
+    const fetchData = async () => {
+      let lastId = null;
+      if (timeline.length > 0) {
+        const lastToot = timeline[timeline.length - 1]
+        lastId = lastToot.id
+      }
+      const previousToots = await getUserTimeline(lastId)
+      setTimeline((existingTimeline) => {
+        return [...existingTimeline, ...previousToots]})
+    }
+    fetchData()
+  }, [timeline]);
 
   const renderItem = ({item}) => {
     return (
@@ -143,8 +152,8 @@ const Timeline = () => {
         onRefresh={onRefresh}
 
         // infinite scroll
-        // onEndReached={loadMore}
-        // onEndReachedThreshold={0.2}
+        onEndReached={loadMore}
+        onEndReachedThreshold={0.2}
         ></FlatList>
     </View>
   );

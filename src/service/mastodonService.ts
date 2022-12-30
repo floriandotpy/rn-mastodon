@@ -2,11 +2,15 @@ import { Status } from "../@types/mastodon";
 
 import config from "../../config.json";
     
-const getUserTimeline = async (): Promise<Array<Status>> => {
-    const url = "https://sigmoid.social/api/v1/timelines/home"
+const getUserTimeline = async (older_than_id: string | null): Promise<Array<Status>> => {
+    let url = "https://sigmoid.social/api/v1/timelines/home"
+
+    if (older_than_id) {
+        url += `?max_id=${older_than_id}`
+    }
     let data: Array<Status> = [];
     try {
-
+        console.log("Fetching from: " + url);
         const response = await fetch(url, {
             method: "GET",
             headers: {
