@@ -63,7 +63,6 @@ const Section: React.FC<
 
 const listStyles = StyleSheet.create({
   container: {
-   flex: 1,
    paddingTop: 22
   },
   item: {
@@ -94,8 +93,8 @@ const Timeline = () => {
 
   const [timeline, setTimeline] = useState<Array<Status>>([]);
   const [shouldRefresh, setShouldRefresh] = useState<boolean>(true);
+  const [page, setPage] = useState<number>(0);
 
-  // const timeline = getUserTimeline();
   useEffect(() => {
     if (shouldRefresh) {
       console.log("Refreshing from API")
@@ -116,6 +115,10 @@ const Timeline = () => {
     console.log(shouldRefresh)
   }, []);
 
+  const loadMore = () => {
+    console.log("Should load more from API")
+  }
+
   const renderItem = ({item}) => {
     return (
       <View style={listStyles.item}>
@@ -129,14 +132,19 @@ const Timeline = () => {
 
   return (
     <View>
-      <Button onPress={onRefresh} title="Refresh" />
       <FlatList 
         style={listStyles.container} 
         data={timeline}
         renderItem={renderItem}
         keyExtractor={item => item.id}
+
+        // pull-to-refresh
         refreshing={shouldRefresh}
         onRefresh={onRefresh}
+
+        // infinite scroll
+        // onEndReached={loadMore}
+        // onEndReachedThreshold={0.2}
         ></FlatList>
     </View>
   );
@@ -146,28 +154,13 @@ const App = () => {
   const isDarkMode = useColorScheme() === 'dark';
 
   const backgroundStyle = {
+    flex: 1,
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
 
   return (
     <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          
-          <Timeline />
-          
-        </View>
-      </ScrollView>
+      <Timeline />
     </SafeAreaView>
   );
 };
