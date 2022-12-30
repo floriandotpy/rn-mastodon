@@ -7,7 +7,7 @@
  *
  * @format
  */
-
+import { getUserTimeline } from "./src/service/mastodonService"
 import React, {type PropsWithChildren} from 'react';
 import {
   FlatList,
@@ -71,41 +71,19 @@ const listStyles = StyleSheet.create({
 });
 
 
-type TootType = {
-  key: string,
-  author: string,
-  content: string
-}
 const Timeline = () => {
-  const img = {
-    uri: 'https://reactnative.dev/img/tiny_logo.png',
-    width: 64,
-    height: 64
-  };
-  const toots: Array<TootType> = [
-    {
-      "key": "1",
-      "author": "Peter",
-      "content": "Hello this is Peter's toot"
-    },
-    {
-      "key": "2",
-      "author": "Uma T",
-      "content": "Hello Mastodon, let's build a small mobile app"
-    }
-  ];
-  const renderItem = ({item}) => {
-      return (
-        <Text style={listStyles.item}>
-          {item.author} wrote: {item.content}
-        </Text>
-      );
-      
-  } 
+
+  const timeline = getUserTimeline();
+
   return (
     <View>
-      <FlatList style={listStyles.container} data={toots} renderItem={renderItem}></FlatList>
-      
+      <FlatList 
+        style={listStyles.container} 
+        data={timeline}
+        renderItem={
+          ({item}) => <Text style={listStyles.item}>{item.account.display_name} ({item.account.acct}) wrote: {item.content}</Text>
+        }
+        ></FlatList>
     </View>
   );
 }
