@@ -65,10 +65,23 @@ const listStyles = StyleSheet.create({
    paddingTop: 22
   },
   item: {
-    padding: 10,
-    fontSize: 18,
-    height: 44,
+    padding: 8,
+    borderBottomColor: "#A6A6AA",
+    borderBottomWidth: 1
   },
+  item_title: {
+    fontSize: 16,
+    fontWeight: "bold"
+  },
+  item_meta: {
+    fontSize: 14,
+    color: "#666666",
+    marginBottom: 4
+  },
+  item_content: {
+    fontSize: 16,
+  },
+
 });
 
 
@@ -84,14 +97,24 @@ const Timeline = () => {
     fetchData()
   }, [])
 
+  const renderItem = ({item}) => {
+    return (
+      <View style={listStyles.item}>
+        <Text style={listStyles.item_title}>{item.account.display_name}</Text>
+        <Text style={listStyles.item_meta}>@{item.account.acct} · {item.created_at}</Text>
+        <Text>{item.reblog ? "This is a reblog" : ""}</Text>
+        <Text style={listStyles.item_content}>{item.content}</Text>
+      </View>
+    ) 
+  }
+
   return (
     <View>
       <FlatList 
         style={listStyles.container} 
         data={timeline}
-        renderItem={
-          ({item}) => <Text style={listStyles.item}>{item.account.display_name} ({item.account.acct}) wrote: {item.content}</Text>
-        }
+        renderItem={renderItem}
+        keyExtractor={item => item.id}
         ></FlatList>
     </View>
   );
