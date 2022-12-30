@@ -8,9 +8,11 @@
  * @format
  */
 import { getUserTimeline } from "./src/service/mastodonService"
-import React, {useEffect, useState, type PropsWithChildren} from 'react';
+import React, {useEffect, useState, useCallback, type PropsWithChildren} from 'react';
 import {
+  Button,
   FlatList,
+  RefreshControl,
   SafeAreaView,
   ScrollView,
   StatusBar,
@@ -84,18 +86,35 @@ const listStyles = StyleSheet.create({
 
 });
 
+const wait = (timeout: number) => {
+  return new Promise(resolve => setTimeout(resolve, timeout));
+}
 
 const Timeline = () => {
 
   const [timeline, setTimeline] = useState<Array<Status>>([]);
+  const [shouldRefresh, setShouldRefresh] = useState<boolean>(true);
 
   // const timeline = getUserTimeline();
   useEffect(() => {
-    const fetchData = async () => {
-      setTimeline(await getUserTimeline())
+    if (shouldRefresh) {
+      console.log("Refreshing from API")
+      const fetchData = async () => {
+        setTimeline(await getUserTimeline())
+      }
+      fetchData()
     }
-    fetchData()
-  }, [])
+    // the wait needs to be required to force that the loading indicator is visible briefly
+    wait(500).then(() => {
+      setShouldRefresh(false)
+    })
+  }, [shouldRefresh])
+
+  const onRefresh = useCallback(() => {
+    console.log("onRefresh")
+    setShouldRefresh(true);
+    console.log(shouldRefresh)
+  }, []);
 
   const renderItem = ({item}) => {
     return (
@@ -110,11 +129,14 @@ const Timeline = () => {
 
   return (
     <View>
+      <Button onPress={onRefresh} title="Refresh" />
       <FlatList 
         style={listStyles.container} 
         data={timeline}
         renderItem={renderItem}
         keyExtractor={item => item.id}
+        refreshing={shouldRefresh}
+        onRefresh={onRefresh}
         ></FlatList>
     </View>
   );
