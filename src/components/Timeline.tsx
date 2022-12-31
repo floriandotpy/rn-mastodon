@@ -48,9 +48,32 @@ const wait = (timeout: number) => {
     return new Promise(resolve => setTimeout(resolve, timeout));
 }
 
+interface StatusProps {
+    status: Status
+}
+const StatusView = (props: StatusProps) => {
+    const { width } = useWindowDimensions();
+    const item = props.status
+    const source = {
+        html: item.content
+    }
+    return (
+        <View>
+            <Text style={styles.item_title}>{item.account.display_name}</Text>
+            <Text style={styles.item_meta}>@{item.account.acct} · {formatDate(item.created_at)}</Text>
+            {item.reblog ? <Text>This is a reblog</Text> :
+                <RenderHtml
+                    baseStyle={styles.item_content}
+                    contentWidth={width}
+                    source={source}
+                />
+            }
+        </View>
+    )
+}
+
 const Timeline = () => {
 
-    const { width } = useWindowDimensions();
     const [timeline, setTimeline] = useState<Array<Status>>([]);
     const [shouldRefresh, setShouldRefresh] = useState<boolean>(true);
 
@@ -90,28 +113,26 @@ const Timeline = () => {
     }, [timeline]);
 
     const renderItem = ({ item }) => {
-        const source = {
-            html: item.content
+        if (item.reblog) {
+            return (
+                <View style={styles.item}>
+                    <Text style={styles.item_reblog}>{item.account.display_name} reblogged:</Text>
+                    <StatusView status={item.reblog} />
+                </View>
+            )
+        } else {
+            return (
+                <View style={styles.item}>
+                    <StatusView status={item} />
+                </View>
+            )
         }
-        return (
-            <View style={listStyles.item}>
-                <Text style={listStyles.item_title}>{item.account.display_name}</Text>
-                <Text style={listStyles.item_meta}>@{item.account.acct} · {formatDate(item.created_at)}</Text>
-                {item.reblog ? <Text>This is a reblog</Text> :
-                    <RenderHtml
-                        baseStyle={listStyles.item_content}
-                        contentWidth={width}
-                        source={source}
-                    />
-                }
-            </View>
-        )
     }
 
     return (
         <View>
             <FlatList
-                style={listStyles.container}
+                style={styles.container}
                 data={timeline}
                 renderItem={renderItem}
                 keyExtractor={item => item.id}
@@ -128,7 +149,7 @@ const Timeline = () => {
     );
 }
 
-const listStyles = StyleSheet.create({
+const styles = StyleSheet.create({
     container: {
         paddingTop: 22
     },
@@ -145,11 +166,16 @@ const listStyles = StyleSheet.create({
     item_meta: {
         fontSize: 14,
         color: "#666666",
-        marginBottom: 8
+        marginBottom: 6
     },
     item_content: {
         fontSize: 16,
     },
+    item_reblog: {
+        fontWeight: "bold",
+        color: "#444444",
+        marginBottom: 6
+    }
 
 });
 
