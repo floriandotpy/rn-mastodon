@@ -89,6 +89,40 @@ const listStyles = StyleSheet.create({
 
 });
 
+
+const formatDate = (dateString: string): string => {
+
+  const secondsNow = Math.floor(new Date().getTime() / 1000);
+  const secondsOther = Math.floor(new Date(dateString).getTime() / 1000);
+  const diff = Number(secondsNow - secondsOther);
+
+  const minute = 60;
+  const hour = minute * 60;
+  const day = hour * 24;
+  const month = day * 30;
+  const year = day * 365;
+
+  if (diff < minute) {
+    const seconds = Math.round(diff);
+    return `${seconds} ${seconds > 1 ? "seconds" : "second"} ago`
+  } else if (diff < hour) {
+    const minutes = Math.round(diff / minute);
+    return `${minutes} ${minutes > 1 ? "minutes" : "minute"} ago`;
+  } else if (diff < day) {
+    const hours = Math.round(diff / hour);
+    return `${hours} ${hours > 1 ? "hours" : "hour"} ago`;
+  } else if (diff < month) {
+    const days = Math.round(diff / day)
+    return `${days} ${days > 1 ? "days" : "day"} ago`;
+  } else if (diff < year) {
+    const months = Math.round(diff / month);
+    return `${months} ${months > 1 ? "months" : "month"} ago`;
+  } else { // diff > year
+    const years = Math.round(diff / year);
+    return `${years} ${years > 1 ? "years" : "year"} ago`;
+  }
+}
+
 const wait = (timeout: number) => {
   return new Promise(resolve => setTimeout(resolve, timeout));
 }
@@ -140,7 +174,7 @@ const Timeline = () => {
     return (
       <View style={listStyles.item}>
         <Text style={listStyles.item_title}>{item.account.display_name}</Text>
-        <Text style={listStyles.item_meta}>@{item.account.acct} · {item.created_at}</Text>
+        <Text style={listStyles.item_meta}>@{item.account.acct} · {formatDate(item.created_at)}</Text>
         {item.reblog ? <Text>This is a reblog</Text> : 
           <RenderHtml
             baseStyle={listStyles.item_content}
