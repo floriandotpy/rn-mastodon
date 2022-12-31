@@ -8,65 +8,24 @@
  * @format
  */
 import { getUserTimeline } from "./src/service/mastodonService"
-import React, {useEffect, useState, useCallback, type PropsWithChildren} from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import {
-  Button,
   FlatList,
-  RefreshControl,
   SafeAreaView,
-  ScrollView,
-  StatusBar,
   StyleSheet,
   Text,
-  useColorScheme,
   View,
   useWindowDimensions
 } from 'react-native';
 
-
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
 import RenderHtml from 'react-native-render-html';
 import { Status } from "./src/@types/mastodon";
 
-const Section: React.FC<
-  PropsWithChildren<{
-    title: string;
-  }>
-> = ({children, title}) => {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
-};
+
 
 const listStyles = StyleSheet.create({
   container: {
-   paddingTop: 22
+    paddingTop: 22
   },
   item: {
     paddingHorizontal: 8,
@@ -162,12 +121,13 @@ const Timeline = () => {
       }
       const previousToots = await getUserTimeline(lastId)
       setTimeline((existingTimeline) => {
-        return [...existingTimeline, ...previousToots]})
+        return [...existingTimeline, ...previousToots]
+      })
     }
     fetchData()
   }, [timeline]);
 
-  const renderItem = ({item}) => {
+  const renderItem = ({ item }) => {
     const source = {
       html: item.content
     }
@@ -175,24 +135,21 @@ const Timeline = () => {
       <View style={listStyles.item}>
         <Text style={listStyles.item_title}>{item.account.display_name}</Text>
         <Text style={listStyles.item_meta}>@{item.account.acct} · {formatDate(item.created_at)}</Text>
-        {item.reblog ? <Text>This is a reblog</Text> : 
+        {item.reblog ? <Text>This is a reblog</Text> :
           <RenderHtml
             baseStyle={listStyles.item_content}
             contentWidth={width}
             source={source}
           />
         }
-        {/* <Text style={listStyles.item_content}>{item.content}</Text> */}
-        {/* <Text>Width: {width}</Text> */}
-        
       </View>
-    ) 
+    )
   }
 
   return (
     <View>
-      <FlatList 
-        style={listStyles.container} 
+      <FlatList
+        style={listStyles.container}
         data={timeline}
         renderItem={renderItem}
         keyExtractor={item => item.id}
@@ -204,43 +161,17 @@ const Timeline = () => {
         // infinite scroll
         onEndReached={loadMore}
         onEndReachedThreshold={0.2}
-        ></FlatList>
+      ></FlatList>
     </View>
   );
 }
 
 const App = () => {
-  const isDarkMode = useColorScheme() === 'dark';
-
-  const backgroundStyle = {
-    flex: 1,
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
-
   return (
-    <SafeAreaView style={backgroundStyle}>
+    <SafeAreaView>
       <Timeline />
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-});
 
 export default App;
