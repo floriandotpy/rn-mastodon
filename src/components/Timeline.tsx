@@ -156,25 +156,31 @@ const styles = StyleSheet.create({
     item: {
         paddingHorizontal: 8,
         paddingVertical: 24,
-        borderBottomColor: "#A6A6AA",
-        borderBottomWidth: 1
+        borderBottomColor: "#DDDDDD",
+        borderBottomWidth: 1,
     },
     item_title: {
-        fontSize: 16,
+        fontFamily: "Menlo",
+        fontSize: 14,
         fontWeight: "bold"
     },
     item_meta: {
         fontSize: 14,
+        fontFamily: "Menlo",
         color: "#666666",
         marginBottom: 6
     },
     item_content: {
-        fontSize: 16,
+        fontFamily: "Menlo",
+        fontSize: 14,
+        lineHeight: 18
     },
     item_reblog: {
         fontWeight: "bold",
+        fontSize: 12,
+        fontFamily: "Menlo",
         color: "#444444",
-        marginBottom: 6
+        marginBottom: 8
     }
 
 });
