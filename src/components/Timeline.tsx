@@ -5,11 +5,12 @@ import {
     StyleSheet,
     Text,
     View,
-    useWindowDimensions
+    useWindowDimensions,
+    Image
 } from 'react-native';
 
 import RenderHtml from 'react-native-render-html';
-import { Status } from "../@types/mastodon";
+import { ImageAttachment, MediaAttachment, Status } from "../@types/mastodon";
 
 const formatDate = (dateString: string): string => {
 
@@ -48,6 +49,69 @@ const wait = (timeout: number) => {
     return new Promise(resolve => setTimeout(resolve, timeout));
 }
 
+interface ImageAttachmentProps {
+    attachment: ImageAttachment,
+    cropHeight: boolean
+}
+
+const ImageAttachmentView = (props: ImageAttachmentProps) => {
+    const a = props.attachment
+
+    // compute image dimension to fill width of screen
+    const fillScreenRatio = 0.9 // 1.0 to fill width 100%
+    const { width } = useWindowDimensions();
+    const imageDimensions = a.meta.small
+    const imageWidth = width * fillScreenRatio;
+
+
+    const imageHeight = (props.cropHeight ? 200
+        : Math.round(width / imageDimensions.width * imageDimensions.height * fillScreenRatio))
+
+    // TODO: Add runctionality to view image in full size when tapping
+    return (
+        <View>
+            <Image
+                source={{ uri: a.preview_url }}
+                style={{
+                    width: imageWidth,
+                    height: imageHeight,
+                    marginBottom: 2,
+                    borderWidth: 1,
+                    borderColor: "#cccccc"
+                }}
+            />
+        </View>
+
+    )
+}
+
+interface AttachmentsProps {
+    attachements: Array<MediaAttachment>
+}
+const AttachementsView = (props: AttachmentsProps) => {
+    const attachementToView = (attachment: MediaAttachment) => {
+        switch (attachment.type) {
+            case "image":
+                return <ImageAttachmentView
+                    attachment={attachment as ImageAttachment}
+                    cropHeight={true} />
+            case "audio":
+                return <Text>Audio attachment not supported yet</Text>
+            case "gifv":
+                return <Text>Gifv attachment not supported yet</Text>
+            case "video":
+                return <Text>Video attachment not supported yet</Text>
+            case "unknown":
+                return <Text>Unknown attachement</Text>
+        }
+    }
+    return (
+        <View>
+            {props.attachements.map(attachementToView)}
+        </View>
+    )
+}
+
 interface StatusProps {
     status: Status
 }
@@ -61,13 +125,13 @@ const StatusView = (props: StatusProps) => {
         <View>
             <Text style={styles.item_title}>{item.account.display_name}</Text>
             <Text style={styles.item_meta}>@{item.account.acct} · {formatDate(item.created_at)}</Text>
-            {item.reblog ? <Text>This is a reblog</Text> :
-                <RenderHtml
-                    baseStyle={styles.item_content}
-                    contentWidth={width}
-                    source={source}
-                />
-            }
+            <RenderHtml
+                baseStyle={styles.item_content}
+                contentWidth={width}
+                source={source}
+            />
+            {item.media_attachments?.length > 0 ? <AttachementsView attachements={item.media_attachments} /> : ""}
+
         </View>
     )
 }

@@ -95,7 +95,63 @@ type ImageAttachmentMetaSmall = {
     size: string;
     width: number;
 }
-type MediaAttachment = (AudioAttachment | GIFVAttachment | ImageAttachment );
+export interface MediaAttachmentPost {
+    file: (Blob | File);
+    thumbnail?: Blob;
+    description?: string;
+    focus?: string;
+}
+export interface UnknownAttachment {
+    description?: (string | null);
+    id: string;
+    meta: Record<string, Record<string, (number | string)>>;
+    preview_url: string;
+    remote_url?: (string | null);
+    /** @deprecated */
+    text_url?: string;
+    type: 'unknown';
+    url: string;
+}
+export interface VideoAttachment {
+    blurhash: string;
+    description?: (string | null);
+    id: string;
+    meta: VideoAttachmentMeta;
+    preview_url: string;
+    remote_url?: (string | null);
+    /** @deprecated */
+    text_url?: string;
+    type: 'video';
+    url: string;
+}
+export interface VideoAttachmentMeta {
+    aspect: number;
+    audio_bitrate: string;
+    audio_channels: string;
+    audio_encode: string;
+    duration: number;
+    fps: number;
+    height: number;
+    length: string;
+    original: VideoAttachmentMetaOriginal;
+    size: string;
+    small: VideoAttachmentMetaSmall;
+    width: number;
+}
+export interface VideoAttachmentMetaOriginal {
+    bitrate: number;
+    duration: number;
+    frame_rate: string;
+    height: number;
+    width: number;
+}
+export interface VideoAttachmentMetaSmall {
+    aspect: number;
+    height: number;
+    size: string;
+    width: number;
+}
+type MediaAttachment = (AudioAttachment | GIFVAttachment | ImageAttachment | UnknownAttachment | VideoAttachment);
 
 
 type Account = {
@@ -182,5 +238,7 @@ type Status = {
 
 export type { 
     Status, 
-    Account 
+    Account,
+    MediaAttachment,
+    ImageAttachment
 };
